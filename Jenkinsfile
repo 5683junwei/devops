@@ -2,8 +2,6 @@
 pipeline {
     agent any
     environment {
-        HARBOR_CREDS = credentials('jenkins-harbor-creds')
-        K8S_CONFIG = credentials('jenkins-k8s-config')
         GIT_TAG = sh(returnStdout: true,script: 'git describe --tags --always').trim()
     }
     parameters {
