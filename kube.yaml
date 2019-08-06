@@ -30,7 +30,7 @@ spec:
         app: test
     spec:
       containers:
-      - image: test:latest
+      - image:  {IMAGE_URL}:{IMAGE_TAG}
         name: test
         imagePullPolicy: Never
         ports:

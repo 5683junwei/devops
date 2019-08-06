@@ -53,8 +53,8 @@ pipeline {
                 }
             }
             steps {
-                sh "sed -e 's#{IMAGE_URL}#192.168.0.8/${params.DOCKER_IMAGE}#g;s#{IMAGE_TAG}#${GIT_TAG}#g;s#{APP_NAME}#${params.APP_NAME}#g;s#{SPRING_PROFILE}#k8s-test#g' k8s-deployment.tpl > k8s-deployment.yml"
-                sh "kubectl apply -f k8s-deployment.yml --namespace=${params.K8S_NAMESPACE}"
+            sh "sed -e 's#{IMAGE_URL}#${params.HARBOR_HOST}/${params.DOCKER_IMAGE}#g;s#{IMAGE_TAG}#${GIT_TAG}#g;s#{APP_NAME}#${params.APP_NAME}#g;s#{SPRING_PROFILE}#k8s-test#g' k8s-deployment.tpl > kube.yaml"
+                sh "kubectl apply -f kube.yaml --namespace=${params.K8S_NAMESPACE}"
             }
 
         }
