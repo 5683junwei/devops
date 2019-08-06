@@ -1,0 +1,30 @@
+# Created by https://www.gitignore.io/api/maven,java-web
+# Edit at https://www.gitignore.io/?templates=maven,java-web
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+target/
+log/
+logs/
+src/test/
+!.mvn/wrapper/maven-wrapper.jar
+
+### Java-Web ###
+## ignoring target file
+target/
+
+### Maven ###
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# End of https://www.gitignore.io/api/maven,java-web
