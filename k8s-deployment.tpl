@@ -19,6 +19,3 @@ spec:
         image: {IMAGE_URL}:{IMAGE_TAG}
         ports:
         - containerPort: 9002
-        env:
-          - name: SPRING_PROFILES_ACTIVE
-            value: {SPRING_PROFILE}
