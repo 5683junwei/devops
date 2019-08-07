@@ -1,8 +1,10 @@
-// 需要在jenkins的Credentials中配置jenkins-harbor-creds、jenkins-k8s-config参数
+// 需要在jenkins的Credentials设置中配置jenkins-harbor-creds、jenkins-k8s-config参数
 pipeline {
     agent any
     environment {
-        GIT_TAG = sh(returnStdout: true,script: 'git describe --tags --always').trim()
+        HARBOR_CREDS = credentials('jenkins-harbor-creds')
+        K8S_CONFIG = credentials('jenkins-k8s-config')
+        GIT_TAG = sh(returnStdout: true,script: 'git describe --tags').trim()
     }
     parameters {
         string(name: 'HARBOR_HOST', defaultValue: '10.3.80.124', description: 'harbor仓库地址')
@@ -34,10 +36,10 @@ pipeline {
             agent any
             steps {
                 unstash 'app'
-                sh "docker login -u admin -p 5683Wang 10.3.80.124"
-                sh "docker build --build-arg JAR_FILE=`ls target/*.jar |cut -d '/' -f2` -t 10.3.80.124/${params.DOCKER_IMAGE}:${GIT_TAG} ."
-                sh "docker push 10.3.80.124/${params.DOCKER_IMAGE}:${GIT_TAG}"
-                sh "docker rmi 10.3.80.124/${params.DOCKER_IMAGE}:${GIT_TAG}"
+                sh "docker login -u ${HARBOR_CREDS_USR} -p ${HARBOR_CREDS_PSW} ${params.HARBOR_HOST}"
+                sh "docker build --build-arg JAR_FILE=`ls target/*.jar |cut -d '/' -f2` -t ${params.HARBOR_HOST}/${params.DOCKER_IMAGE}:${GIT_TAG} ."
+                sh "docker push ${params.HARBOR_HOST}/${params.DOCKER_IMAGE}:${GIT_TAG}"
+                sh "docker rmi ${params.HARBOR_HOST}/${params.DOCKER_IMAGE}:${GIT_TAG}"
             }
 
         }
@@ -53,8 +55,10 @@ pipeline {
                 }
             }
             steps {
-                sh "sed -e 's#{IMAGE_URL}#${params.HARBOR_HOST}/${params.DOCKER_IMAGE}#g;s#{IMAGE_TAG}#${GIT_TAG}#g;s#{APP_NAME}#${params.APP_NAME}#g;s#{SPRING_PROFILE}#k8s-test#g' kube.yaml > kube.yaml"
-                sh "kubectl create -f kube.yaml --namespace=${params.K8S_NAMESPACE}"
+                sh "mkdir -p ~/.kube"
+                sh "echo ${K8S_CONFIG} | base64 -d > ~/.kube/config"
+                sh "sed -e 's#{IMAGE_URL}#${params.HARBOR_HOST}/${params.DOCKER_IMAGE}#g;s#{IMAGE_TAG}#${GIT_TAG}#g;s#{APP_NAME}#${params.APP_NAME}#g;s#{SPRING_PROFILE}#k8s-test#g' k8s-deployment.tpl > k8s-deployment.yml"
+                sh "kubectl apply -f k8s-deployment.yml --namespace=${params.K8S_NAMESPACE}"
             }
 
         }
